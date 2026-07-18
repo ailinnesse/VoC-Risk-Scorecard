@@ -22,11 +22,15 @@ The project deliberately spans all three data roles:
 - **Data science** — use SQL Server vector similarity (`find_similar_docs_by_doc_id` over precomputed embeddings) to surface recurring complaint themes across a multilingual corpus (EN/ES/FR)
 - **Data analysis** — turn it into a ranked, decision-ready scorecard with an executive summary
 
+![Pipeline: one live SQL MCP source → three data roles → one audited finding](assets/pipeline-diagram.png)
+
 ## What the trust audit found
 
 This is the part I'd want you to read. Rather than trusting vector similarity, I measured it — hand-labelling retrieved neighbours as true/partial/false to compute **precision**, then reading the full 89-document corpus to establish ground truth and compute **recall**. Three findings:
 
-**1. Similarity tracks topic, not sentiment.** A 5-star delighted review sat at cosine distance 0.32 from a 1-star complaint about the same product — a false positive a naive pipeline would count as a complaint.
+**1. Similarity tracks topic, not sentiment.** A 5-star delighted review sat at cosine distance 0.32 from a 1-star complaint about the same product — a false positive a naive pipeline would count as a complaint. You can see it in the audit table itself (DocId 18, second row — the verdict column deliberately left for human judgment):
+
+![Hand-labelling audit table with the 5-star false positive at distance 0.32](assets/pairwise-audit.png)
 
 **2. Single-seed retrieval is blind to what it wasn't seeded with.** Seeding from one complaint theme (premium-quality) recovered 3/7 of its own documents and **0/6** of a second, entirely distinct defect cluster (a smart-fabric top losing app connectivity after washing). Recall 0.00 — the exact failure mode an unaudited embedding search hides.
 
@@ -39,7 +43,7 @@ This is the part I'd want you to read. Rather than trusting vector similarity, I
 | [`voc_risk_scorecard.ipynb`](voc_risk_scorecard.ipynb) | The rerunnable pipeline — live DB connection, parameterised thresholds and weights, per-SKU aggregation, transparent scoring, exec summary, and a vector-search evidence layer |
 | [`data/zava_docs_labelled.xlsx`](data/zava_docs_labelled.xlsx) | The hand-labelled 89-document corpus used as ground truth for the precision/recall audit |
 | [`docs/prompt-journey.md`](docs/prompt-journey.md) | The five-step prompt log: how the agent was directed, what each step returned, and what went wrong |
-| `assets/` | Screenshots of live tool calls and the final scorecard |
+| `assets/` | The pipeline diagram, the final scorecard, the hand-labelling audit table, and live tool-call evidence |
 
 ## How it was built
 
