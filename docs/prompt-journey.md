@@ -22,6 +22,10 @@ This is the working log behind the [VoC Risk Scorecard](../README.md) — five p
 
 **Outcome:** ✅ The "messy" result was the point: of the retrieved neighbourhood, one true match, two partial (milder 2-star reviews), and one clean false positive — a 5-star delighted review of the same SKU at cosine distance 0.32. Live proof that **similarity tracks topic, not sentiment**.
 
+The raw `read_records` output and the assembled hand-labelling table, exactly as returned:
+
+![Raw tool result and pairwise hand-labelling table](../assets/pairwise-audit-full.png)
+
 ## Step 3 — Read everything, to know what retrieval missed
 
 **Goal:** Pull the entire Docs corpus as CSV (parsing rating/language out of `TagsJson`) for full hand-labelling — establishing ground truth for recall, not just precision.
@@ -32,7 +36,9 @@ This is the working log behind the [VoC Risk Scorecard](../README.md) — five p
 
 **Goal:** Having found the connectivity cluster by reading (not by retrieval), confirm retrieval recovers it when seeded from inside, then quantify the SKU: sales footprint, support burden, complaint footprint, and rank against all SKUs.
 
-**Outcome:** ✅ Retrieval seeded from inside the cluster recovered it cleanly (DocId 39 → 44, 42, 40, 41). The SKU is the most-complained-about identifiable product: 9 tickets vs 1–3 for peers, uniformly low satisfaction, 14 negative docs in three languages. **One data caveat discovered later:** `read_records` silently paginates at 100 rows, so the sales totals from this step (210 units / $18,265) were undercounted; the step-5 notebook's direct connection corrected them (228 units / $19,825). Verify tool limits before trusting tool output.
+**Outcome:** ✅ Retrieval seeded from inside the cluster recovered it cleanly (DocId 39 → 44, 42, 40, 41). The SKU is the most-complained-about identifiable product: 9 tickets vs 1–3 for peers, uniformly low satisfaction, 14 negative docs in three languages.
+
+![Live tool calls: SKU ticket ranking and complaint footprint](../assets/step4-live-tool-calls.png) **One data caveat discovered later:** `read_records` silently paginates at 100 rows, so the sales totals from this step (210 units / $18,265) were undercounted; the step-5 notebook's direct connection corrected them (228 units / $19,825). Verify tool limits before trusting tool output.
 
 ## Step 5 — Make it rerunnable
 
